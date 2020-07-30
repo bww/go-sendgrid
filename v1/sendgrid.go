@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bww/go-util/debug"
-	"github.com/bww/go-util/text"
-	"github.com/bww/go-util/urls"
+	"github.com/bww/go-util/v1/debug"
+	"github.com/bww/go-util/v1/text"
+	"github.com/bww/go-util/v1/urls"
 )
 
 var (
@@ -125,11 +125,11 @@ type Config struct {
 
 // A Sendgrid client
 type Client struct {
-	client        *http.Client
-	base          string
-	apikey        string
-	override      string
-	defaultSender Address
+	client          *http.Client
+	base            string
+	apikey          string
+	overrideAddress string
+	defaultSender   Address
 }
 
 // Create a client
