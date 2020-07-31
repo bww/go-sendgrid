@@ -121,6 +121,7 @@ type Config struct {
 	BaseURL         string
 	OverrideAddress string
 	DefaultSender   Address
+	Simulate        bool
 }
 
 // A Sendgrid client
@@ -130,6 +131,7 @@ type Client struct {
 	apikey          string
 	overrideAddress string
 	defaultSender   Address
+	simulate        bool
 }
 
 // Create a client
@@ -146,6 +148,7 @@ func New(conf Config) (*Client, error) {
 		apikey:          conf.APIKey,
 		overrideAddress: conf.OverrideAddress,
 		defaultSender:   conf.DefaultSender,
+		simulate:        conf.Simulate,
 	}, nil
 }
 
@@ -169,6 +172,9 @@ type storeContactsRequest struct {
 
 // Create or update a contact
 func (c Client) StoreContacts(contacts []*Contact, lists []string) error {
+	if c.simulate {
+		return nil
+	}
 
 	data, err := json.Marshal(storeContactsRequest{Contacts: contacts, Lists: lists})
 	if err != nil {
@@ -190,8 +196,11 @@ func (c Client) StoreContacts(contacts []*Contact, lists []string) error {
 
 // Fetch a contact by their local identifier
 func (c Client) fetchContact(params url.Values) (*Contact, error) {
-	u := urls.Join(c.base, "/marketing/contacts/search")
+	if c.simulate {
+		return nil, ErrNotFound
+	}
 
+	u := urls.Join(c.base, "/marketing/contacts/search")
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s?%s", u, params.Encode()), nil)
 	if err != nil {
 		return nil, err
@@ -232,6 +241,7 @@ func (c Client) FetchContactByEmail(email string) (*Contact, error) {
 
 // Send an email
 func (c Client) SendEmail(email *Email) error {
+	var err error
 
 	if c.overrideAddress != "" {
 		for _, p := range email.Personalizations {
@@ -244,9 +254,20 @@ func (c Client) SendEmail(email *Email) error {
 		}
 	}
 
-	data, err := json.Marshal(email)
+	var data []byte
+	if c.simulate {
+		data, err = json.MarshalIndent(email, "", "  ")
+	} else {
+		data, err = json.Marshal(email)
+	}
 	if err != nil {
 		return err
+	}
+
+	if c.simulate {
+		fmt.Printf("sendgrid: POST %s\n", urls.Join(c.base, "/mail/send"))
+		fmt.Println(text.Indent(string(data), "        > "))
+		return nil
 	}
 
 	req, err := http.NewRequest("POST", urls.Join(c.base, "/mail/send"), bytes.NewReader(data))
