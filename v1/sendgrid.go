@@ -228,7 +228,7 @@ func (c Client) fetchContact(params url.Values) (*Contact, error) {
 // Fetch a contact by their local identifier
 func (c Client) FetchContact(id string) (*Contact, error) {
 	params := make(url.Values)
-	params.Set("pynt_id", id)
+	params.Set("ext_id", id)
 	return c.fetchContact(params)
 }
 
