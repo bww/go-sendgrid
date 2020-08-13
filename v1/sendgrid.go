@@ -87,11 +87,12 @@ func Traits(m map[string]interface{}) []*Field {
 
 // A contact
 type Contact struct {
-	Id        string   `json:"id,omitempty"`
-	Email     string   `json:"email,omitempty"`
-	FirstName string   `json:"first_name,omitempty"`
-	LastName  string   `json:"last_name,omitempty"`
-	Lists     []string `json:"list_ids,omitempty"`
+	Id        string                 `json:"id,omitempty"`
+	Email     string                 `json:"email,omitempty"`
+	FirstName string                 `json:"first_name,omitempty"`
+	LastName  string                 `json:"last_name,omitempty"`
+	Lists     []string               `json:"list_ids,omitempty"`
+	Fields    map[string]interface{} `json:"custom_fields,omitempty"`
 }
 
 // An error
