@@ -13,6 +13,16 @@ type mock struct {
 	base string
 }
 
+func Mock(apikey string, opts ...Option) (Client, error) {
+	conf := Config{
+		Endpoint: defaultEndpoint,
+	}
+	for _, o := range opts {
+		conf = o(conf)
+	}
+	return &mock{base: conf.Endpoint}, nil
+}
+
 func (c mock) SendEmail(email *Email) error {
 	c.dump("POST", "/mail/send", email)
 	return nil
