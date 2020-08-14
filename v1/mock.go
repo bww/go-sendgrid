@@ -42,16 +42,16 @@ func (c mock) StoreContacts(contacts []*Contact, lists []string) error {
 func (c mock) FetchContact(id string) (*Contact, error) {
 	params := make(url.Values)
 	params.Set("ext_id", id)
-	return c.fetchContact(params)
+	return c.FetchContactWithParams(params)
 }
 
 func (c mock) FetchContactByEmail(email string) (*Contact, error) {
 	params := make(url.Values)
 	params.Set("email", email)
-	return c.fetchContact(params)
+	return c.FetchContactWithParams(params)
 }
 
-func (c mock) fetchContact(params url.Values) (*Contact, error) {
+func (c mock) FetchContactWithParams(params url.Values) (*Contact, error) {
 	path := "/marketing/contacts/search"
 	if len(params) > 0 {
 		path += "?" + params.Encode()

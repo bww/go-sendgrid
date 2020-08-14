@@ -21,6 +21,7 @@ type Client interface {
 	StoreContacts(contacts []*Contact, lists []string) error
 	FetchContact(id string) (*Contact, error)
 	FetchContactByEmail(email string) (*Contact, error)
+	FetchContactWithParams(params url.Values) (*Contact, error)
 	SendEmail(email *Email) error
 }
 
@@ -81,7 +82,7 @@ func (c client) StoreContacts(contacts []*Contact, lists []string) error {
 }
 
 // Fetch a contact by their local identifier
-func (c client) fetchContact(params url.Values) (*Contact, error) {
+func (c client) FetchContactWithParams(params url.Values) (*Contact, error) {
 	u := urls.Join(c.base, "/marketing/contacts/search")
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s?%s", u, params.Encode()), nil)
 	if err != nil {
@@ -110,15 +111,15 @@ func (c client) fetchContact(params url.Values) (*Contact, error) {
 // Fetch a contact by their local identifier
 func (c client) FetchContact(id string) (*Contact, error) {
 	params := make(url.Values)
-	params.Set("ext_id", id)
-	return c.fetchContact(params)
+	params.Set("user_id", id)
+	return c.FetchContactWithParams(params)
 }
 
 // Fetch a contact by their email address.
 func (c client) FetchContactByEmail(email string) (*Contact, error) {
 	params := make(url.Values)
 	params.Set("email", email)
-	return c.fetchContact(params)
+	return c.FetchContactWithParams(params)
 }
 
 // Send an email
