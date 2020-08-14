@@ -123,20 +123,7 @@ func (c client) FetchContactByEmail(email string) (*Contact, error) {
 
 // Send an email
 func (c client) SendEmail(email *Email) error {
-	var err error
-
-	if c.overrideAddress != "" {
-		for _, p := range email.Personalizations {
-			for i, a := range p.Recipients {
-				p.Recipients[i] = Address{
-					Email: c.overrideAddress,
-					Name:  a.Name,
-				}
-			}
-		}
-	}
-
-	data, err := json.Marshal(email)
+	data, err := json.Marshal(prepareEmail(email, c.defaultSender, c.overrideAddress))
 	if err != nil {
 		return err
 	}
@@ -210,4 +197,25 @@ func (c client) Send(req *http.Request) (*http.Response, []byte, error) {
 	default:
 		return nil, nil, fmt.Errorf("Unexpected status code: %v", rsp.Status)
 	}
+}
+
+func prepareEmail(email *Email, defaultSender Address, overrideAddress string) *Email {
+	dup := *email
+	if dup.From.IsZero() {
+		dup.From = defaultSender
+	}
+	if dup.ReplyTo.IsZero() {
+		dup.ReplyTo = defaultSender
+	}
+	if overrideAddress != "" {
+		for _, p := range dup.Personalizations {
+			for i, a := range p.Recipients {
+				p.Recipients[i] = Address{
+					Email: overrideAddress,
+					Name:  a.Name,
+				}
+			}
+		}
+	}
+	return &dup
 }

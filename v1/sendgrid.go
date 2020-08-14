@@ -24,6 +24,10 @@ type Address struct {
 	Name  string `json:"name"`
 }
 
+func (a Address) IsZero() bool {
+	return a.Email == ""
+}
+
 type Personalization struct {
 	Recipients    []Address     `json:"to"`
 	Substitutions Substitutions `json:"dynamic_template_data,omitempty"`

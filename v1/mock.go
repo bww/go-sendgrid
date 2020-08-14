@@ -10,7 +10,9 @@ import (
 )
 
 type mock struct {
-	base string
+	base            string
+	defaultSender   Address
+	overrideAddress string
 }
 
 func Mock(apikey string, opts ...Option) (Client, error) {
@@ -20,11 +22,15 @@ func Mock(apikey string, opts ...Option) (Client, error) {
 	for _, o := range opts {
 		conf = o(conf)
 	}
-	return &mock{base: conf.Endpoint}, nil
+	return &mock{
+		base:            conf.Endpoint,
+		defaultSender:   conf.DefaultSender,
+		overrideAddress: conf.OverrideAddress,
+	}, nil
 }
 
 func (c mock) SendEmail(email *Email) error {
-	c.dump("POST", "/mail/send", email)
+	c.dump("POST", "/mail/send", prepareEmail(email, c.defaultSender, c.overrideAddress))
 	return nil
 }
 
