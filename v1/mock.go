@@ -13,6 +13,7 @@ type mock struct {
 	base            string
 	defaultSender   Address
 	overrideAddress string
+	verbose         bool
 }
 
 func Mock(apikey string, opts ...Option) (Client, error) {
@@ -26,6 +27,7 @@ func Mock(apikey string, opts ...Option) (Client, error) {
 		base:            conf.Endpoint,
 		defaultSender:   conf.DefaultSender,
 		overrideAddress: conf.OverrideAddress,
+		verbose:         conf.Verbose,
 	}, nil
 }
 
@@ -62,7 +64,7 @@ func (c mock) FetchContactWithParams(params url.Values) (*Contact, error) {
 
 func (c mock) dump(method, url string, entity interface{}) error {
 	var data []byte
-	if entity != nil {
+	if c.verbose && entity != nil {
 		var err error
 		data, err = json.MarshalIndent(entity, "", "  ")
 		if err != nil {

@@ -6,7 +6,7 @@ type Config struct {
 	Endpoint        string
 	OverrideAddress string
 	DefaultSender   Address
-	Simulate        bool
+	Verbose         bool
 }
 
 func Endpoint(base string) Option {
@@ -26,6 +26,13 @@ func DefaultSender(sender Address) Option {
 func OverrideAddress(override string) Option {
 	return func(c Config) Config {
 		c.OverrideAddress = override
+		return c
+	}
+}
+
+func Verbose(on bool) Option {
+	return func(c Config) Config {
+		c.Verbose = on
 		return c
 	}
 }

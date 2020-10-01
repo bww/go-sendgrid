@@ -31,6 +31,7 @@ type client struct {
 	apikey          string
 	overrideAddress string
 	defaultSender   Address
+	verbose         bool
 }
 
 // Create a client
@@ -47,6 +48,7 @@ func New(apikey string, opts ...Option) (Client, error) {
 		base:            conf.Endpoint,
 		overrideAddress: conf.OverrideAddress,
 		defaultSender:   conf.DefaultSender,
+		verbose:         conf.Verbose,
 	}, nil
 }
 
