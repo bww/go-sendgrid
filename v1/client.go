@@ -38,6 +38,7 @@ type client struct {
 func New(apikey string, opts ...Option) (Client, error) {
 	conf := Config{
 		Endpoint: defaultEndpoint,
+		Verbose:  debug.VERBOSE || debug.DEBUG,
 	}
 	for _, o := range opts {
 		conf = o(conf)
@@ -154,7 +155,7 @@ func (c client) Send(req *http.Request) (*http.Response, []byte, error) {
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	if debug.VERBOSE {
+	if c.verbose {
 		fmt.Println("sendgrid:", req.Method, req.URL)
 		if req.Body != nil {
 			data, err := ioutil.ReadAll(req.Body)
@@ -179,7 +180,7 @@ func (c client) Send(req *http.Request) (*http.Response, []byte, error) {
 		return nil, nil, err
 	}
 
-	if debug.VERBOSE {
+	if c.verbose {
 		fmt.Println(text.Indent(string(data), " < "))
 		fmt.Println()
 	}
